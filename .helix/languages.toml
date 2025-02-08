@@ -1,6 +1,12 @@
 [language-server]
 clangd = { command = "clangd" }
 
+[language-server.typos]
+command = "typos-lsp"
+environment = {"RUST_LOG" = "error"}
+# config.config = "~/code/typos-lsp/crates/typos-lsp/tests/typos.toml"
+config.diagnosticSeverity = "Warning"
+
 [[language]]
 name = "c"
 scope = "source.c"
@@ -8,5 +14,5 @@ injection-regex = "c"
 file-types = ["c"] # TODO: ["h"]
 comment-token = "//"
 block-comment-tokens = { start = "/*", end = "*/" }
-language-servers = [ "clangd" ]
+language-servers = [ "clangd", "typos" ]
 indent = { tab-width = 2, unit = "  " }

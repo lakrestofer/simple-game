@@ -5,6 +5,7 @@ project('simple-game', 'c',
 subdir('src')
 incdir = include_directories('include')
 
+
 exe = executable(
   'simple-game',
   sources: sources,

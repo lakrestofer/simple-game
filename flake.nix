@@ -34,6 +34,8 @@
                   meson
                   ninja
                   gdb
+                  typos
+                  pkg-config
                 ];
 
               };
