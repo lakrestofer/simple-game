@@ -1,7 +1,9 @@
 {
   description = "A Nix-flake-based C/C++ development environment";
 
-  inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  };
 
   outputs =
     { self, nixpkgs }:
@@ -29,25 +31,15 @@
             pkgs.mkShell.override
               {
                 # Override stdenv in order to change compiler:
-                # stdenv = pkgs.clangStdenv;
+                stdenv = pkgs.clangStdenv;
               }
               {
                 packages =
                   with pkgs;
                   [
-                    graphviz
-                    flex
-                    bison
                     clang-tools
-                    cmake
-                    codespell
-                    conan
-                    cppcheck
-                    doxygen
-                    gtest
-                    lcov
-                    vcpkg
-                    vcpkg-tool
+                    meson
+                    ninja
                   ]
                   ++ (if system == "aarch64-darwin" then [ ] else [ gdb ]);
               };
