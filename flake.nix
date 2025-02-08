@@ -30,6 +30,9 @@
               }
               {
                 packages = with pkgs; [
+                  cglm
+                  glfw
+                  blas
                   clang-tools
                   meson
                   ninja
