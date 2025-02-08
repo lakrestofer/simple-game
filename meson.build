@@ -11,6 +11,7 @@ project('simple-game', 'c',
 glfw_dep = dependency('glfw3')
 cblas_dep = dependency('cblas')
 cglm_dep = dependency('cglm')
+open_gl_dep = dependency('gl')
 
 cc = meson.get_compiler('c')
 m_dep = cc.find_library('m', required : false)
@@ -20,6 +21,7 @@ deps = [
   cblas_dep,
   cglm_dep,
   m_dep,
+  open_gl_dep
 ]
 
 subdir('src')

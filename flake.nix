@@ -30,6 +30,7 @@
               }
               {
                 packages = with pkgs; [
+                  glxinfo
                   cglm
                   glfw
                   blas
