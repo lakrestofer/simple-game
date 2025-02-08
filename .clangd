@@ -1,0 +1,7 @@
+Diagnostics:
+  ClangTidy:
+    Add: [modernize*]
+
+CompileFlags:
+  Add: [-std=c11, -Wall, -Wextra, -Wshadow, -Iinclude]
+  CompilationDatabase: builddir
