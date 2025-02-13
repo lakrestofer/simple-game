@@ -1,5 +1,6 @@
-[language-server]
-clangd = { command = "clangd" }
+[language-server.clangd]
+command = "clangd"
+args = [ "--clang-tidy" ]
 
 [language-server.typos]
 command = "typos-lsp"
