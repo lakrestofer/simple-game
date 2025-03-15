@@ -20,6 +20,8 @@
 #define SOKOL_NUKLEAR_NO_SOKOL_APP // do not depend on sokol_app.h
 #include "sokol_nuklear.h"
 
+#include "flecs.h"
+
 #include "macro_utils.h"
 
 // util macros
@@ -50,6 +52,35 @@ typedef union {
   int elements[2];
 } IVec2;
 
+typedef union {
+  struct {
+    float x, y;
+  };
+  struct {
+    float u, v;
+  };
+  struct {
+    float left, right;
+  };
+  struct {
+    float width, height;
+  };
+  float elements[2];
+} FVec2;
+
+typedef union {
+  struct {
+    float x, y, z;
+  };
+  float elements[3];
+} FVec3;
+typedef union {
+  struct {
+    float r, g, b;
+  };
+  float elements[3];
+} FColor;
+typedef uint64_t Index;
 // struct containing event information, to be digested by nuklear
 typedef struct {
   int mouse_pos[2];
@@ -83,6 +114,8 @@ const float vertices[] = { // positions            // colors
     0.0F, 0.5F, 0.5F, 1.0F, 0.0F, 0.0F, 1.0F, 0.5F, -0.5F, 0.5F, 0.0F, 1.0F,
     0.0F, 1.0F, -0.5F, -0.5F, 0.5F, 0.0F, 0.0F, 1.0F, 1.0F};
 
+ecs_world_t* world = NULL;
+
 int main(void) {
   simpleGameInitGfx(); // initalize glfw, sokol and nuklear
   glfwSetInputMode(glfw_window(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -90,6 +123,10 @@ int main(void) {
   //   glfwSetInputMode(glfw_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   //   glfwSetInputMode(glfw_window(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
   // }
+  world = ecs_init();
+
+  ECS_COMPONENT(world, FVec2);
+  ecs_entity_t e = ecs_entity(world, {.name = "Triangle"});
 
   // create window and GL context via GLFW
   sg_buffer vbuf =
@@ -150,6 +187,7 @@ int main(void) {
   }
 
   // cleanup
+  ecs_fini(world);
   simpleGameCleanGfx();
   return 0;
 }
@@ -166,6 +204,8 @@ static void cursorPosCb(GLFWwindow* w, double x, double y) {
 }
 
 static void mouseBtnCb(GLFWwindow* win, int button, int action, int mod) {
+  UNUSED(win);
+  UNUSED(mod);
   if (action == GLFW_PRESS) {
     if (button == GLFW_MOUSE_BUTTON_RIGHT) {
       glfw_nuklear.btn_down[NK_BUTTON_RIGHT] = true;
@@ -231,5 +271,3 @@ static void simpleGameCleanGfx(void) {
   sg_shutdown();
   glfwTerminate();
 }
-
-static void render_nuklear_gui(void) {}

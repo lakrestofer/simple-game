@@ -1,6 +1,7 @@
 Diagnostics:
   ClangTidy:
     Add: [modernize*, clang-analyzer-*, bugprone*, misc*]
+    Remove: [bugprone-easily-swappable-parameters]
 
 CompileFlags:
   Add: [-std=c11, -Wall, -Wextra, -Wshadow, -Iinclude]

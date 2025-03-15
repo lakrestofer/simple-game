@@ -2,4 +2,4 @@
 
 ## First steps
 - [X] render a red triangle
-- [ ] render a texture over a triangle
+- [ ] how to implement an allocator that request memory using mmap?
