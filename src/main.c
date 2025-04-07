@@ -11,18 +11,15 @@
 #define NK_INCLUDE_FONT_BAKING
 #define NK_INCLUDE_DEFAULT_FONT
 #define NK_INCLUDE_STANDARD_VARARGS
+#include "glfw_glue.h"
 #include "sokol_gfx.h"
 #include "sokol_log.h"
-
-#include "glfw_glue.h"
 #define NK_IMPLEMENTATION
 #include "nuklear.h"
-#define SOKOL_NUKLEAR_NO_SOKOL_APP // do not depend on sokol_app.h
-#include "sokol_nuklear.h"
-
+#define SOKOL_NUKLEAR_NO_SOKOL_APP  // do not depend on sokol_app.h
 #include "flecs.h"
-
 #include "macro_utils.h"
+#include "sokol_nuklear.h"
 
 // util macros
 #define NK_NEW_FRAME(ctx) ctx = snk_new_frame()
@@ -95,11 +92,11 @@ typedef struct {
 } glfw_nk_state_t;
 
 // glfw input event callbacks
-static void cursorPosCb(GLFWwindow* w, double x, double y);
-static void mouseBtnCb(GLFWwindow* w, button_t b, action_t a, mod_t m);
+static void cursorPosCb(GLFWwindow *w, double x, double y);
+static void mouseBtnCb(GLFWwindow *w, button_t b, action_t a, mod_t m);
 
 /// given the global state in _glfw_nuklear, pass it to nuklear and reset.
-static void nkHandleGlfwEvent(struct nk_context* ctx);
+static void nkHandleGlfwEvent(struct nk_context *ctx);
 
 /// initialize global state of glfw, sokol and nuklear.
 static void simpleGameInitGfx(void);
@@ -109,50 +106,68 @@ static void simpleGameCleanGfx(void);
 // global state!
 static glfw_nk_state_t glfw_nuklear;
 
-// a vertex buffer
-const float vertices[] = { // positions            // colors
-    0.0F, 0.5F, 0.5F, 1.0F, 0.0F, 0.0F, 1.0F, 0.5F, -0.5F, 0.5F, 0.0F, 1.0F,
-    0.0F, 1.0F, -0.5F, -0.5F, 0.5F, 0.0F, 0.0F, 1.0F, 1.0F};
+// clang-format off
+const float vertices[] = {
+      // positions            // colors
+       0.0f,  0.5f, 0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+       0.5f, -0.5f, 0.5f,     0.0f, 1.0f, 0.0f, 1.0f,
+      -0.5f, -0.5f, 0.5f,     0.0f, 0.0f, 1.0f, 1.0f
+  };
+// clang-format on
 
-ecs_world_t* world = NULL;
+ecs_world_t *world = NULL;
+
+const char *TRNGL_VERT_SHAD_SRC =
+  "#version 410\n"
+  "layout(location=0) in vec4 position;\n"
+  "layout(location=1) in vec4 color0;\n"
+  "out vec4 color;\n"
+  "void main() {\n"
+  "  gl_Position = position;\n"
+  "  color = color0;\n"
+  "}\n";
+
+const char *TRNGL_FRAG_SHAD_SRC =
+  "#version 410\n"
+  "in vec4 color;\n"
+  "out vec4 frag_color;\n"
+  "void main() {\n"
+  "  frag_color = color;\n"
+  "}\n";
 
 int main(void) {
-  simpleGameInitGfx(); // initalize glfw, sokol and nuklear
+  simpleGameInitGfx();  // initalize glfw, sokol and nuklear
   glfwSetInputMode(glfw_window(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-  // if (glfwRawMouseMotionSupported()) {
-  //   glfwSetInputMode(glfw_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  //   glfwSetInputMode(glfw_window(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-  // }
   world = ecs_init();
 
   ECS_COMPONENT(world, FVec2);
   ecs_entity_t e = ecs_entity(world, {.name = "Triangle"});
 
   // create window and GL context via GLFW
-  sg_buffer vbuf =
-      sg_make_buffer(&(sg_buffer_desc){.data = SG_RANGE(vertices)});
+  sg_buffer vbuf = sg_make_buffer(&(sg_buffer_desc){
+    .data = SG_RANGE(vertices),
+  });
 
   // a shader
-  sg_shader shd = sg_make_shader(&(sg_shader_desc){
-      .vertex_func.source = "#version 410\n"
-                            "layout(location=0) in vec4 position;\n"
-                            "layout(location=1) in vec4 color0;\n"
-                            "out vec4 color;\n"
-                            "void main() {\n"
-                            "  gl_Position = position;\n"
-                            "  color = color0;\n"
-                            "}\n",
-      .fragment_func.source = "#version 410\n"
-                              "in vec4 color;\n"
-                              "out vec4 frag_color;\n"
-                              "void main() {\n"
-                              "  frag_color = color;\n"
-                              "}\n"});
+  sg_shader_desc shd_desc = {
+    .vertex_func.source = TRNGL_VERT_SHAD_SRC,
+    .fragment_func.source = TRNGL_FRAG_SHAD_SRC,
+  };
+  sg_shader shd = sg_make_shader(&shd_desc);
 
   // a pipeline state object (default render states are fine for triangle)
-  sg_pipeline pip = sg_make_pipeline(&(sg_pipeline_desc){.shader = shd,
-      .layout = {.attrs = {[0].format = SG_VERTEXFORMAT_FLOAT3,
-                     [1].format = SG_VERTEXFORMAT_FLOAT4}}});
+  sg_pipeline_desc pip_desc = {
+    .shader = shd,
+    .layout =
+      {
+        .attrs =
+          {
+            [0].format = SG_VERTEXFORMAT_FLOAT3,
+            [1].format = SG_VERTEXFORMAT_FLOAT4,
+          },
+      },
+  };
+  sg_pipeline pip = sg_make_pipeline(&pip_desc);
 
   // resource bindings
   sg_bindings bind = {.vertex_buffers[0] = vbuf};
@@ -167,11 +182,13 @@ int main(void) {
 
     // pass events to nuklear
     // draw Nuklear ui
-    struct nk_context* ctx = NULL;
+    struct nk_context *ctx = NULL;
     defer(NK_NEW_FRAME(ctx), NK_END_FRAME()) {
       nkHandleGlfwEvent(ctx);
-      if (nk_begin(ctx, "Show", nk_rect(50, 50, 220, 220),
-              NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE)) {
+      if (nk_begin(ctx,
+                   "Show",
+                   nk_rect(50, 50, 220, 220),
+                   NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE)) {
         /* fixed widget pixel width */
         nk_layout_row_static(ctx, 30, 80, 1);
         if (nk_button_label(ctx, "button")) { /* event handling */
@@ -192,7 +209,7 @@ int main(void) {
   return 0;
 }
 
-static void cursorPosCb(GLFWwindow* w, double x, double y) {
+static void cursorPosCb(GLFWwindow *w, double x, double y) {
   UNUSED(w);
   int ix = (int)x;
   int iy = (int)y;
@@ -203,7 +220,7 @@ static void cursorPosCb(GLFWwindow* w, double x, double y) {
   glfw_nuklear.mouse_pos[1] = iy;
 }
 
-static void mouseBtnCb(GLFWwindow* win, int button, int action, int mod) {
+static void mouseBtnCb(GLFWwindow *win, int button, int action, int mod) {
   UNUSED(win);
   UNUSED(mod);
   if (action == GLFW_PRESS) {
@@ -224,22 +241,28 @@ static void mouseBtnCb(GLFWwindow* win, int button, int action, int mod) {
   }
 }
 
-static void nkHandleGlfwEvent(struct nk_context* ctx) {
+static void nkHandleGlfwEvent(struct nk_context *ctx) {
   defer(nk_input_begin(ctx), nk_input_end(ctx)) {
     if (glfw_nuklear.mouse_did_move) {
       nk_input_motion(
-          ctx, glfw_nuklear.mouse_pos[0], glfw_nuklear.mouse_pos[1]);
+        ctx, glfw_nuklear.mouse_pos[0], glfw_nuklear.mouse_pos[1]);
       glfw_nuklear.mouse_did_move = false;
     }
     for (int i = 0; i < NK_BUTTON_MAX; i++) {
       if (glfw_nuklear.btn_down[i]) {
         glfw_nuklear.btn_down[i] = false;
-        nk_input_button(ctx, (enum nk_buttons)i, glfw_nuklear.mouse_pos[0],
-            glfw_nuklear.mouse_pos[1], 1);
+        nk_input_button(ctx,
+                        (enum nk_buttons)i,
+                        glfw_nuklear.mouse_pos[0],
+                        glfw_nuklear.mouse_pos[1],
+                        1);
       } else if (glfw_nuklear.btn_up[i]) {
         glfw_nuklear.btn_up[i] = false;
-        nk_input_button(ctx, (enum nk_buttons)i, glfw_nuklear.mouse_pos[0],
-            glfw_nuklear.mouse_pos[1], 0);
+        nk_input_button(ctx,
+                        (enum nk_buttons)i,
+                        glfw_nuklear.mouse_pos[0],
+                        glfw_nuklear.mouse_pos[1],
+                        0);
       }
     }
   }
@@ -248,15 +271,15 @@ static void nkHandleGlfwEvent(struct nk_context* ctx) {
 /// initialize global state of glfw, sokol and nuklear.
 static void simpleGameInitGfx(void) {
   glfw_init(&(glfw_desc_t){
-      .title = "simple-game",
-      .width = 640,
-      .height = 480,
-      .no_depth_buffer = true,
+    .title = "simple-game",
+    .width = 640,
+    .height = 480,
+    .no_depth_buffer = true,
   });
   // setup sokol_gfx
   sg_setup(&(sg_desc){
-      .environment = glfw_environment(),
-      .logger.func = slog_func,
+    .environment = glfw_environment(),
+    .logger.func = slog_func,
   });
   // setup sokol_nuklear
   snk_desc_t setup_nuklear_desc = {0};
