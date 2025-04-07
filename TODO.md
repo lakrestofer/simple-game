@@ -1,5 +1,8 @@
 # TODO
 
-## First steps
-- [X] render a red triangle
-- [ ] how to implement an allocator that request memory using mmap?
+- glfw
+  - [X] create window
+  - [ ] attach logging to glfw
+  - [X] destroy window
+- logging
+  - implement interface for application wide logging
