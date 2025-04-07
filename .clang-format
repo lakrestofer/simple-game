@@ -11,3 +11,4 @@ PenaltyBreakAssignment: 100
 AlignAfterOpenBracket: Align
 BinPackArguments: false
 BinPackParameters: false
+SortIncludes: false
