@@ -1,5 +1,3 @@
-#define LINKED_LIST_IMPL
-
 // =======================================================================
 // # Required macro definitions check
 //
@@ -12,29 +10,20 @@
 //   - the prefix of every generated function
 // - LINKED_LIST_VALUE_TYPE
 //   - the type of the value contained in every list node
+//   - must contain a next and previous field
+//   - `int`
+// - LINKED_LIST_VALUE_NAME
+//   - the name of the type, as it should be prefixed to any generated types
 // =======================================================================
 
-// toggle whether to check for the required macros or not
-#define CHECK_MACROS_DEFINED
-
-#ifdef CHECK_MACROS_DEFINED
-    #ifndef LINKED_LIST_FUNCTION_PREFIX
-        #error "LINKED_LIST_FUNCTION_PREFIX" is not defined."
-    #endif
-    #ifndef LINKED_LIST_VALUE_TYPE
-        #error "LINKED_LIST_VALUE_TYPE" is not defined."
-    #endif
+#ifndef LINKED_LIST_FUNCTION_PREFIX
+    #error "LINKED_LIST_FUNCTION_PREFIX" is not defined."
 #endif
-
-// toggle whether to check for the fields
-#define CHECK_TYPES_VALID
-
-#if defined(CHECK_TYPES_VALID) && defined(LINKED_LIST_VALUE_TYPE)
-    #include "std/macros/types/assert_has_field.h"
-
-STATIC_ASSERT_HAS_FIELD(LINKED_LIST_VALUE_TYPE, next);
-STATIC_ASSERT_HAS_FIELD(LINKED_LIST_VALUE_TYPE, previous);
-
+#ifndef LINKED_LIST_VALUE_TYPE
+    #error "LINKED_LIST_VALUE_TYPE" is not defined."
+#endif
+#ifndef LINKED_LIST_VALUE_NAME
+    #error "LINKED_LIST_VALUE_NAME" is not defined."
 #endif
 
 // =======================================================================
@@ -50,6 +39,8 @@ STATIC_ASSERT_HAS_FIELD(LINKED_LIST_VALUE_TYPE, previous);
 // - definitions.t.h - using the identifiers, generate the definitions
 // - unmacros.t.h - undef the identifier macros
 // =======================================================================
+
+#define LINKED_LIST_IMPL
 
 #include "std/datastructures/linked_list/impl/macros.t.h"
 #include "std/datastructures/linked_list/impl/declarations.t.h"

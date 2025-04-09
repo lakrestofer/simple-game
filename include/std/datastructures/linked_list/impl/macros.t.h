@@ -1,8 +1,8 @@
 #ifndef LINKED_LIST_IMPL
     #error "This is an internal header. Do not include it."
-#else
+#endif
 
-    #include "std/macros/macro_utils.h"
+#include "std/macros/macro_utils.h"
 
 // =======================================================================
 // IDENTIFIER MACROS
@@ -15,11 +15,15 @@
 // repeated) inclusion of these templates can be performed
 // =======================================================================
 
-    // naming macros
-    #define LINKED_LIST_FUNC_IDENT(name) \
-        MCONCAT(LINKED_LIST_FUNCTION_PREFIX, name)
+// intList -> intListAdd
+#define LINKED_LIST_FUNC_IDENT(name) MCONCAT(LINKED_LIST_FUNCTION_PREFIX, name)
+// Int -> IntLinkedList
+// Int -> IntNode
+#define LINKED_LIST_TYPE_IDENT(name) MCONCAT(LINKED_LIST_VALUE_NAME, name)
 
-    // name of linked list struct type
-    #define LinkedListType MCONCAT(LINKED_LIST_VALUE_TYPE, LinkedList)
+// name of linked list struct type
+#define LinkedList LINKED_LIST_TYPE_IDENT(LinkedList)
+#define Node LINKED_LIST_TYPE_IDENT(Node)
+#define NodeValue LINKED_LIST_VALUE_TYPE
 
-#endif  // LINKED_LIST_IMPL
+#undef LINKED_LIST_FUNC_IDENT

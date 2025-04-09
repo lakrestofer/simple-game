@@ -1,5 +1,4 @@
 #include "window.h"
-#include "macro_utils.h"
 
 // ===================================================
 // private vars begin
@@ -21,20 +20,20 @@ static void framebuffer_size_cb(GLFWwindow* win, int w, int h);
 GLFWwindow* getWindow() { return win; }
 
 void createWindow(char* title) {
-  // glfw init
-  glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_WAYLAND);
-  if (!glfwInit()) return;
+    // glfw init
+    glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_WAYLAND);
+    if (!glfwInit()) return;
 
-  win = glfwCreateWindow(WIDTH, HEIGHT, title, glfwGetPrimaryMonitor(), NULL);
-  glfwSetFramebufferSizeCallback(win, framebuffer_size_cb);
-  if (!win) {
-    glfwTerminate();
-    return;
-  }
-  glfwMakeContextCurrent(win);
+    win = glfwCreateWindow(WIDTH, HEIGHT, title, glfwGetPrimaryMonitor(), NULL);
+    glfwSetFramebufferSizeCallback(win, framebuffer_size_cb);
+    if (!win) {
+        glfwTerminate();
+        return;
+    }
+    glfwMakeContextCurrent(win);
 
-  // init opengl
-  glViewport(0, 0, WIDTH, HEIGHT);
+    // init opengl
+    glViewport(0, 0, WIDTH, HEIGHT);
 }
 
 /// get the window height
@@ -49,8 +48,7 @@ void destroyWindow() { glfwTerminate(); }
 // private function implementation begin
 // ===================================================
 static void framebuffer_size_cb(GLFWwindow* window, int w, int h) {
-  UNUSED(window);
-  HEIGHT = h;
-  WIDTH = w;
-  glViewport(0, 0, w, h);
+    HEIGHT = h;
+    WIDTH = w;
+    glViewport(0, 0, w, h);
 }
