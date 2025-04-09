@@ -2,13 +2,15 @@
 Language:        Cpp
 BasedOnStyle:    Google
 AlwaysBreakBeforeMultilineStrings: true
-IndentWidth: 2
-ContinuationIndentWidth: 2
+IndentWidth: 4
+ContinuationIndentWidth: 4
 IndentCaseLabels: true
 BreakBeforeBraces: Attach
 PenaltyBreakAssignment: 100
-# PenaltyBreakBeforeFirstCallParameter: 100
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: BlockIndent
+Cpp11BracedListStyle: true
+AllowAllParametersOfDeclarationOnNextLine: true
 BinPackArguments: false
 BinPackParameters: false
 SortIncludes: false
+IndentPPDirectives: BeforeHash

@@ -1,17 +1,8 @@
 #ifndef STRING_H_DEFINED
 #define STRING_H_DEFINED
 
-#include <stddef.h>
+#include "types.h"
 
-#define Slice(type) \
-  struct {          \
-    type* data;     \
-    size_t len;     \
-  }
-
-typedef struct {
-  char* data;
-  size_t len;
-} String;
+typedef Slice(char) String;
 
 #endif  // STRING_H_DEFINED

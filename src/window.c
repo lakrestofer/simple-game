@@ -4,7 +4,7 @@
 // ===================================================
 // private vars begin
 // ===================================================
-static GLFWwindow* window = NULL;
+static GLFWwindow* win = NULL;
 static int HEIGHT = 400;
 static int WIDTH = 600;
 
@@ -18,24 +18,23 @@ static void framebuffer_size_cb(GLFWwindow* win, int w, int h);
 // ===================================================
 // header implementation begin
 // ===================================================
-GLFWwindow* getWindow() { return window; }
+GLFWwindow* getWindow() { return win; }
 
 void createWindow(char* title) {
+  // glfw init
   glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_WAYLAND);
-  // glfwInitHint(GLFW_WAYLAND_LIBDECOR, GLFW_WAYLAND_PREFER_LIBDECOR);
   if (!glfwInit()) return;
 
-  window = glfwCreateWindow(WIDTH, HEIGHT, title, NULL, NULL);
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_cb);
-
-  // init opengl
-  glViewport(0, 0, WIDTH, HEIGHT);
-
-  if (!window) {
+  win = glfwCreateWindow(WIDTH, HEIGHT, title, glfwGetPrimaryMonitor(), NULL);
+  glfwSetFramebufferSizeCallback(win, framebuffer_size_cb);
+  if (!win) {
     glfwTerminate();
     return;
   }
-  glfwMakeContextCurrent(window);
+  glfwMakeContextCurrent(win);
+
+  // init opengl
+  glViewport(0, 0, WIDTH, HEIGHT);
 }
 
 /// get the window height
@@ -49,8 +48,8 @@ void destroyWindow() { glfwTerminate(); }
 // ===================================================
 // private function implementation begin
 // ===================================================
-static void framebuffer_size_cb(GLFWwindow* win, int w, int h) {
-  UNUSED(win);
+static void framebuffer_size_cb(GLFWwindow* window, int w, int h) {
+  UNUSED(window);
   HEIGHT = h;
   WIDTH = w;
   glViewport(0, 0, w, h);

@@ -4,5 +4,5 @@ Diagnostics:
     Remove: [bugprone-easily-swappable-parameters]
 
 CompileFlags:
-  Add: [-std=c11, -Wall, -Wextra, -Wshadow, -Iinclude]
+  Add: [-std=c11, -Wall, -Wextra, -Wshadow, -Iinclude, -D__CLANGD__]
   CompilationDatabase: builddir
