@@ -1,6 +1,4 @@
-#ifndef MACRO_UTILS_H_DEFINED
-#define MACRO_UTILS_H_DEFINED
-
+#pragma once
 // =======================================================================
 // Macro utils
 //
@@ -22,5 +20,3 @@
 
 // creates a unique (per line) identifier
 #define MVAR(name) name##__LINE__
-
-#endif  // MACRO_UTILS_H_DEFINED

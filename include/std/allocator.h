@@ -1,5 +1,4 @@
-#ifndef ALLOCATOR_H_DEFINED
-#define ALLOCATOR_H_DEFINED
+#pragma once
 // internal imports
 
 // external imports
@@ -13,14 +12,20 @@ typedef void* (*AllocFn)(void* ctx, size_t size);
 typedef void* (*AllocAlignedFn)(void* ctx, size_t size, size_t alignment);
 typedef void (*DeallocFn)(void* ctx, void* ptr);
 
-/// VTable for @ref Allocator
-typedef struct AllocatorVTable {
+/// VTable for  Allocator
+struct AllocatorVTable {
     AllocFn alloc;
     AllocFn alloc_nonzeroed;
     AllocAlignedFn alloc_aligned;
     AllocAlignedFn alloc_nonzeroed_aligned;
     DeallocFn dealloc;
-} AllocatorVTable;
+};
+
+/// A generic allocator
+struct Allocator {
+    void* data;
+    AllocatorVTable* vtable;
+};
 
 /// Create allocator vtable
 AllocatorVTable allocatorVtableNew(
@@ -30,14 +35,9 @@ AllocatorVTable allocatorVtableNew(
     AllocAlignedFn alloc_nonzeroed_aligned_impl,
     DeallocFn dealloc_impl
 );
-/// A generic allocator
-struct Allocator {
-    void* const data;
-    AllocatorVTable* const vtable;
-};
 
 /// Create allocator
-Allocator allocatorNew(void* const data, AllocatorVTable* const vtable);
+Allocator allocatorNew(void* data, AllocatorVTable* vtable);
 
 /// Allocate memory. Zeroes memory. Does not align address
 void* alloc(Allocator* allocator, size_t size);
@@ -53,5 +53,3 @@ void* allocNonZeroedAligned(
 
 /// Deallocates memory
 void dealloc(Allocator* allocator, void* ptr);
-
-#endif  // ALLOCATOR_H_DEFINED
