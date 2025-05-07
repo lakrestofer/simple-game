@@ -2,6 +2,18 @@
 #include "window.h"
 #include "std/preamble.h"
 
+#define PIXEL_W 640
+#define PIXEL_H 340
+
+typedef struct Pos {
+    int x;
+    int y;
+} Pos;
+
+typedef struct Player {
+    Pos pos;
+} Player;
+
 int main(void) {
     createWindow("some title");
     while (!glfwWindowShouldClose(getWindow())) {
@@ -15,4 +27,5 @@ int main(void) {
         glfwPollEvents();
     }
     destroyWindow();
+    return 0;
 }
