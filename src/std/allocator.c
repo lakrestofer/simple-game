@@ -1,4 +1,4 @@
-#include "std/allocator.h"
+#include "std/mem/allocator.h"
 
 /// Create allocator vtable
 AllocatorVTable allocatorVtableNew(

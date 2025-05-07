@@ -3,9 +3,9 @@
 #include <stdbool.h>
 #include "std/macros/container_of.h"
 
-// ============================================================================
-// Type definitions
-// ============================================================================
+///////////////////////////////////////////////////////////////////////////////
+// TYPE DEFINITIONS
+///////////////////////////////////////////////////////////////////////////////
 
 typedef struct List List;
 
@@ -14,12 +14,12 @@ struct List {
     List* next;
 };
 
-// ============================================================================
-// Function definitions
-// ============================================================================
+///////////////////////////////////////////////////////////////////////////////
+// FUNCTION DEFINITIONS
+///////////////////////////////////////////////////////////////////////////////
 
 // ----------------------------------------------------------------------------
-// public
+// public interface
 // ----------------------------------------------------------------------------
 
 static inline void listAppend(List* list, List* new);
@@ -41,17 +41,18 @@ static inline bool listIsEmpty(List* list);
 #define listForEach(pos, head) \
     for (pos = (head)->next; !listIsHead(pos, (head)); pos = pos->next)
 // NOLINTEND(bugprone-macro-parentheses)
+
 // ----------------------------------------------------------------------------
-// private
+// private interface
 // ----------------------------------------------------------------------------
 
 /// PRIVATE do not use directly. Add new between prev and next
 static inline void listAddBetween_(List* new, List* prev, List* next);
-static inline void listDel_(List* prev, List* next);
+static inline void listDelBetween_(List* prev, List* next);
 
-// ============================================================================
+// ////////////////////////////////////////////////////////////////////////////
 // Function implementations
-// ============================================================================
+// ////////////////////////////////////////////////////////////////////////////
 
 // ----------------------------------------------------------------------------
 // public
@@ -66,7 +67,9 @@ static inline void listPrepend(List* list, List* new) {
     listAddBetween_(new, list->prev, list);
 }
 
-static inline void listDelete(List* list) { listDel_(list->prev, list->next); }
+static inline void listDelete(List* list) {
+    listDelBetween_(list->prev, list->next);
+}
 static inline void listReplace(List* old, List* new) {
     new->next = old->next;
     new->next->prev = new;
@@ -101,7 +104,7 @@ static inline void listAddBetween_(List* new, List* prev, List* next) {
     new->prev = prev;
     prev->next = new;
 }
-static inline void listDel_(List* prev, List* next) {
+static inline void listDelBetween_(List* prev, List* next) {
     next->prev = prev;
     prev->next = next;
 }

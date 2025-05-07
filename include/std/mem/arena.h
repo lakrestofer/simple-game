@@ -1,7 +1,7 @@
 #pragma once
 #include <stddef.h>
 #include <stdint.h>
-#include "allocator.h"
+#include "std/mem/allocator.h"
 #include "stdbool.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,6 +57,9 @@ void* arenaAlloc(Arena* a, size_t size);
 void* arenaAllocNonZeroed(Arena* a, size_t size);
 void* arenaAllocAligned(Arena* a, size_t size, size_t alignment);
 void* arenaAllocNonZeroedAligned(Arena* a, size_t size, size_t alignment);
+
+/// dealocate memory
+void arenaDealloc(Arena* a, void* ptr);
 
 /// resets an arena, freeing all the memory used
 void arenaResetFree(Arena* arena);

@@ -1,7 +1,9 @@
-#include "std/arena.h"
+#include <stddef.h>
 #include <string.h>
 #include <assert.h>
-#include "std/allocator.h"
+#include "std/mem/align_up.h"
+#include "std/mem/allocator.h"
+#include "std/mem/arena.h"
 
 #define ARENA_REGION_DEFAULT_CAPACITY (8 * 1024)
 
@@ -72,6 +74,26 @@ void* arenaAllocNonZeroed(Arena* a, size_t size) {
     return result;
 }
 
+void* arenaAllocAligned(Arena* a, size_t size, size_t alignment) {
+    void* result = arenaAllocNonZeroedAligned(a, size, alignment);
+    memset(result, 0, size);
+    return result;
+}
+
+void* arenaAllocNonZeroedAligned(Arena* a, size_t size, size_t alignment) {
+    (void)a;
+    (void)size;
+    (void)alignment;
+    assert(false && "Not implemented yet");
+    return NULL;
+}
+
+void arenaDealloc(Arena* a, void* ptr) {
+    (void)a;
+    (void)ptr;
+    // noop
+}
+
 /// resets an arena, freeing all the memory used
 void arenaResetFree(Arena* arena) {
     ArenaRegion* r = arena->start;
@@ -117,14 +139,35 @@ void arenaResetRetainWithLimit(Arena* arena, size_t limit) {
     );
 }
 
-static void* allocImpl(void* ctx, size_t size) {
+static inline void* allocImpl(void* ctx, size_t size) {
     return arenaAlloc((Arena*)ctx, size);
 }
-static void* allocNonZeroedImpl(void* ctx, size_t size) {}
-static void* allocAlignedImpl(void* ctx, size_t size, size_t alignment) {}
-static void* allocNonZeroedAlignedImpl(
+static inline void* allocNonZeroedImpl(void* ctx, size_t size) {
+    return arenaAllocNonZeroed((Arena*)ctx, size);
+}
+static inline void* allocAlignedImpl(void* ctx, size_t size, size_t alignment) {
+    return arenaAllocAligned((Arena*)ctx, size, alignment);
+}
+static inline void* allocNonZeroedAlignedImpl(
     void* ctx, size_t size, size_t alignment
-) {}
+) {
+    return arenaAllocNonZeroedAligned((Arena*)ctx, size, alignment);
+}
+static inline void deallocImpl(void* ctx, void* ptr) {
+    (void)ctx;
+    (void)ptr;
+    // noop
+}
+
+static AllocatorVTable arena_allocator_vtable = {
+    .alloc = allocImpl,
+    .alloc_nonzeroed = allocNonZeroedImpl,
+    .alloc_aligned = allocAlignedImpl,
+    .alloc_nonzeroed_aligned = allocNonZeroedAlignedImpl,
+    .dealloc = deallocImpl,
+};
 
 /// given an arena, return an allocator
-Allocator arenaToAllocator(Arena* arena) {}
+Allocator arenaToAllocator(Arena* arena) {
+    return allocatorNew(arena, &arena_allocator_vtable);
+}
